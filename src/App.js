@@ -23,16 +23,44 @@ const list = [
 class App extends Component {
   constructor(props) {
     super(props);
-    this.key = 'test';
+    this.key = 'time';
 
     this.state = { 
       list,
-      [this.key]: 'asd'
+      [this.key]: new Date() // computed property for the example
     };
+
+    this.onDismiss = this.onDismiss.bind(this);
   }
+
+  componentDidMount() {
+    this.timerId = setInterval(
+      () => this.tick(),
+      1000
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerId);
+  }
+
+  tick() {
+    this.setState({ [this.key]: new Date() });
+  }
+
+  onDismiss(id) {
+    const isNotId = item => item.objectID !== id;
+    const updatedList = this.state.list.filter(isNotId);
+
+    this.setState({ list: updatedList });
+  }
+
   render() {
+    const key = 'time';
+
     return (
       <div className="App">
+        <h2>{this.state[key].toLocaleString()}</h2>
         {this.state.list.map(item => (
           <div key={item.objectID}>
             <span>
@@ -41,9 +69,15 @@ class App extends Component {
             <span>{item.author}</span>
             <span>{item.num_comments}</span>
             <span>{item.points}</span>
+            <span>
+              <button 
+                onClick={() => this.onDismiss(item.objectID)}
+              >
+                Dismiss
+              </button>
+            </span>
           </div>
         ))}
-        <h2>{this.state.test}</h2>
       </div>
     );
   }
