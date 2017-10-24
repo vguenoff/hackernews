@@ -25,12 +25,10 @@ class App extends Component {
     super(props);
     this.key = 'time';
 
-    this.state = { 
+    this.state = {
       list,
       [this.key]: new Date() // computed property for the example
     };
-
-    this.onDismiss = this.onDismiss.bind(this);
   }
 
   componentDidMount() {
@@ -44,15 +42,20 @@ class App extends Component {
     clearInterval(this.timerId);
   }
 
-  tick() {
-    this.setState({ [this.key]: new Date() });
-  }
-
-  onDismiss(id) {
+  onDismiss = (id) => {
+    console.log(this);
     const isNotId = item => item.objectID !== id;
     const updatedList = this.state.list.filter(isNotId);
 
     this.setState({ list: updatedList });
+  }
+
+  onClickMe = () => {
+    console.log(this);
+  }
+
+  tick() {
+    this.setState({ [this.key]: new Date() });
   }
 
   render() {
@@ -70,7 +73,7 @@ class App extends Component {
             <span>{item.num_comments}</span>
             <span>{item.points}</span>
             <span>
-              <button 
+              <button
                 onClick={() => this.onDismiss(item.objectID)}
               >
                 Dismiss
@@ -78,6 +81,9 @@ class App extends Component {
             </span>
           </div>
         ))}
+        <span>
+          <button onClick={this.onClickMe}>Click me</button>
+        </span>
       </div>
     );
   }
