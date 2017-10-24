@@ -21,13 +21,6 @@ const externalList = [
 ];
 
 // higher order function
-// function isSearched(searchTerm) {
-//   return function(item) {
-//     // some condition which returns true or false
-//     return item.title.toLowerCase().includes(searchTerm.toLowerCase());
-//   };
-// }
-
 const isSearched = searchTerm => item => item.title.toLowerCase().includes(searchTerm.toLowerCase());
 
 class App extends Component {
