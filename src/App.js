@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 
-const list = [
+const externalList = [
   {
     title: 'React',
     url: 'https://reactjs.org/',
@@ -20,14 +20,25 @@ const list = [
   },
 ];
 
+// higher order function
+// function isSearched(searchTerm) {
+//   return function(item) {
+//     // some condition which returns true or false
+//     return item.title.toLowerCase().includes(searchTerm.toLowerCase());
+//   };
+// }
+
+const isSearched = searchTerm => item => item.title.toLowerCase().includes(searchTerm.toLowerCase());
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.key = 'time';
 
     this.state = {
-      list,
-      [this.key]: new Date() // computed property for the example
+      list: externalList,
+      [this.key]: new Date(), // computed property for the example
+      searchTerm: '',
     };
   }
 
@@ -42,16 +53,15 @@ class App extends Component {
     clearInterval(this.timerId);
   }
 
+  onSearchChange = (e) => {
+    this.setState({ searchTerm: e.target.value });
+  }
+
   onDismiss = (id) => {
-    console.log(this);
     const isNotId = item => item.objectID !== id;
     const updatedList = this.state.list.filter(isNotId);
 
     this.setState({ list: updatedList });
-  }
-
-  onClickMe = () => {
-    console.log(this);
   }
 
   tick() {
@@ -59,12 +69,21 @@ class App extends Component {
   }
 
   render() {
-    const key = 'time';
+    const { list, searchTerm } = this.state; // obj destruction example
 
     return (
       <div className="App">
-        <h2>{this.state[key].toLocaleString()}</h2>
-        {this.state.list.map(item => (
+        <h2>{this.state[this.key].toLocaleString()}</h2>
+        <form>
+          {/* making input a controlled component by setting value={searchTerm}  */}
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={this.onSearchChange}
+          />
+        </form>
+        <hr/>
+        {list.filter(isSearched(searchTerm)).map(item => (
           <div key={item.objectID}>
             <span>
               <a href={item.url} target="_blank">{item.title}</a>
@@ -81,9 +100,6 @@ class App extends Component {
             </span>
           </div>
         ))}
-        <span>
-          <button onClick={this.onClickMe}>Click me</button>
-        </span>
       </div>
     );
   }
