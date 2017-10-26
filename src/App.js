@@ -1,49 +1,38 @@
 import React, { Component } from 'react';
 import './App.css';
 
-const externalList = [
-  {
-    title: 'React',
-    url: 'https://reactjs.org/',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: 'Redux',
-    url: 'https://github.com/reactjs/redux',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-];
+import Clock from './Clock';
+import Search from './Search';
+import Table from './Table';
 
-// higher order function
-const isSearched = searchTerm => item => item.title.toLowerCase().includes(searchTerm.toLowerCase());
+const PATH_BASE = 'https://hn.algolia.com/api/v1';
+const PATH_SEARCH = '/search';
+const PARAM_SEARCH = 'query=';
+const DEFAULT_QUERY = 'redux';
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.key = 'time';
 
     this.state = {
-      list: externalList,
-      [this.key]: new Date(), // computed property for the example
-      searchTerm: '',
+      result: null,
+      searchTerm: DEFAULT_QUERY,
     };
   }
 
   componentDidMount() {
-    this.timerId = setInterval(
-      () => this.tick(),
-      1000
-    );
+    const { searchTerm } = this.state;
+    this.fetchSearchStories(searchTerm);
   }
 
-  componentWillUnmount() {
-    clearInterval(this.timerId);
+  // setSearchTopStories = result => this.setState({ result });
+
+  fetchSearchStories = (searchTerm) => {
+    // https://hn.algolia.com/api/v1/search?query=redux
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
+      .then(response => response.json())
+      .then(result => this.setState({ result }))
+      .catch(e => console.log(e));
   }
 
   onSearchChange = (e) => {
@@ -52,47 +41,37 @@ class App extends Component {
 
   onDismiss = (id) => {
     const isNotId = item => item.objectID !== id;
-    const updatedList = this.state.list.filter(isNotId);
+    const updatedHits = this.state.result.hits.filter(isNotId);
 
-    this.setState({ list: updatedList });
-  }
-
-  tick() {
-    this.setState({ [this.key]: new Date() });
+    this.setState({ 
+      result: { ...this.state.result, hits: updatedHits }
+    });
   }
 
   render() {
-    const { list, searchTerm } = this.state; // obj destruction example
+    const { searchTerm, result } = this.state; // obj destruction example
 
     return (
-      <div className="App">
-        <h2>{this.state[this.key].toLocaleString()}</h2>
-        <form>
-          {/* making input a controlled component by setting value={searchTerm}  */}
-          <input
-            type="text"
+      <div className="page">
+        <Clock />
+        <hr/>
+        <div className="interactions">
+          <Search
             value={searchTerm}
             onChange={this.onSearchChange}
-          />
-        </form>
-        <hr/>
-        {list.filter(isSearched(searchTerm)).map(item => (
-          <div key={item.objectID}>
-            <span>
-              <a href={item.url} target="_blank">{item.title}</a>
-            </span>
-            <span>{item.author}</span>
-            <span>{item.num_comments}</span>
-            <span>{item.points}</span>
-            <span>
-              <button
-                onClick={() => this.onDismiss(item.objectID)}
-              >
-                Dismiss
-              </button>
-            </span>
-          </div>
-        ))}
+          >
+            Search:
+            <span>&nbsp;</span>
+          </Search>
+        </div>
+        {
+          result &&
+            <Table
+              list={result.hits}
+              pattern={searchTerm}
+              onDismiss={this.onDismiss}
+            />
+        }
       </div>
     );
   }
