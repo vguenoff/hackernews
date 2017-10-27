@@ -1,14 +1,21 @@
 import React from 'react';
 
-const Search = ({ value, onChange, children }) => (
-  <form>
+const Search = ({
+  children,
+  value,
+  onChange,
+  onSubmit
+}) => (
+  <form onSubmit={onSubmit}>
     {/* making input a controlled component by setting value={searchTerm} */}
-    {children}
     <input
       type="text"
       value={value}
       onChange={onChange}
     />
+    <button type="submit">
+      {children}
+    </button>
   </form>
 );
 

@@ -4,7 +4,7 @@ import Button from './Button';
 import './polyfills';
 
 // higher order function
-const isSearched = searchTerm => item => item.title.toLowerCase().includes(searchTerm.toLowerCase());
+// const isSearched = searchTerm => item => item.title.toLowerCase().includes(searchTerm.toLowerCase());
 
 const Table = ({ list, pattern, onDismiss }) => {
   const largeColumn = { width: '40%' };
@@ -13,7 +13,7 @@ const Table = ({ list, pattern, onDismiss }) => {
 
   return (
     <div className="table">
-      {list.filter(isSearched(pattern)).map(item => (
+      {list.map(item => (
         <div key={item.objectID} className="table-row">
           <span style={largeColumn}>
             <a href={item.url} target="_blank">{item.title}</a>
